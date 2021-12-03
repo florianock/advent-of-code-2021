@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 def get_diagnostics_report(filename):
     with open(filename) as f:
@@ -10,10 +10,10 @@ def binary_tally(strings):
     num_length = len(bits[0])
     result = []
     for index in range(num_length):
-        ints_at_index = [*map(lambda x:int(x[index]), bits)]
+        ints_at_index = [int(x[index]) for x in bits]
         count_ones = sum(ints_at_index)
         count_zeroes = len(bits)-count_ones
-        result.append([count_zeroes, count_ones]) 
+        result.append((count_zeroes, count_ones))
     return result
 
 

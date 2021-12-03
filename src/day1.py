@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 def read_numbers(filename):
     with open(filename) as f:
