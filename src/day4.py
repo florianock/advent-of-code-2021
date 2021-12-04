@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
-from dataclasses import dataclass
 
 Row = list[int]
 Col = list[int]
 Board = list[Row]
-
-
-@dataclass
-class Result:
-    round: int
-    score: int
 
 
 def main(file):
@@ -31,21 +24,21 @@ def get_score_for_worst_board(inputs: str) -> int:
 
 
 def get_ultimate_score(boards: list[Board], numbers: list[int], i_want_to_win: bool = True) -> int:
-    results = [result for result in [get_result(board, numbers) for board in boards] if result.round > -1]
-    results.sort(key=lambda result: result.round)
+    results = [result for result in [get_result(board, numbers) for board in boards] if result["round"] > -1]
+    results.sort(key=lambda result: result["round"])
     if i_want_to_win:
         best_result = results[0]
     else:
         best_result = results[-1]
-    return numbers[best_result.round] * best_result.score
+    return numbers[best_result["round"]] * best_result["score"]
 
 
-def get_result(board: Board, numbers: list[int]) -> Result:
+def get_result(board: Board, numbers: list[int]) -> dict:
     for n in range(len(numbers)):
         numbers_so_far = numbers[0:n+1]
         if rows_bingo(board, numbers_so_far) or cols_bingo(board, numbers_so_far):
-            return Result(n, get_remaining_board_value(board, numbers_so_far))
-    return Result(-1, -1)
+            return {"round": n, "score": get_remaining_board_value(board, numbers_so_far)}
+    return dict.fromkeys(['round', 'score'], -1)
 
 
 def rows_bingo(board: Board, numbers: list[int]) -> bool:
@@ -57,7 +50,7 @@ def cols_bingo(board: Board, numbers: list[int]) -> bool:
 
 
 def bingo(nums: list[int], inputs: list[int]) -> bool:
-    return not set(nums)-set(inputs)
+    return not set(nums) - set(inputs)
 
 
 def get_remaining_board_value(board: Board, numbers: list[int]):
