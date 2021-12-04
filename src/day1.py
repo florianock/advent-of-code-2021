@@ -17,7 +17,7 @@ def count_changes(inputs, window_size=1):
     return change_count
 
 
-def main(file='example.txt'):
+def main(file):
     depths = read_numbers(file)
 
     change_count = count_changes(depths)

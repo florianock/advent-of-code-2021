@@ -48,7 +48,7 @@ def get_common_number(strings, bias):
         strings = matching
 
 
-def main(file='example.txt'):
+def main(file):
     diagnostics = get_diagnostics_report(file)
     counts = binary_tally(diagnostics)
 

@@ -39,7 +39,7 @@ def follow(instructions):
     return pos, depth
 
 
-def main(file='example.txt'):
+def main(file):
     instructions = read_instructions(file)
 
     print("incorrectly following instructions:")
