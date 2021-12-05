@@ -65,7 +65,7 @@ def get_range(a: int, b: int) -> list[int]:
 
 def find_overlaps(lines: list[Line]) -> list[Point]:
     points = [point for line in lines for point in line]
-    return [point for point, count in Counter(points).items() if count > 1]
+    return [point for (point, count) in Counter(points).items() if count > 1]
 
 
 def read_input(filename):
