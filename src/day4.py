@@ -49,8 +49,8 @@ def cols_bingo(board: Board, numbers: list[int]) -> bool:
     return any([bingo(col, numbers) for col in invert(board)])
 
 
-def bingo(nums: list[int], inputs: list[int]) -> bool:
-    return not set(nums) - set(inputs)
+def bingo(numbers_from_board: list[int], drawn_numbers: list[int]) -> bool:
+    return not set(numbers_from_board) - set(drawn_numbers)
 
 
 def get_remaining_board_value(board: Board, numbers: list[int]):
