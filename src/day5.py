@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 from collections import Counter
+import itertools
+
+flatten = itertools.chain.from_iterable
 
 Point = (int, int)
 Line = list[Point]
@@ -27,7 +30,7 @@ def process_inputs(inputs: str) -> list[Line]:
     return list(map(convert_to_line, processed))
 
 
-def convert_to_line(line: list[str]) -> list[Point]:
+def convert_to_line(line: list[str]) -> Line:
     return list(map(convert_to_point, line))
 
 
@@ -37,6 +40,7 @@ def convert_to_point(point: str) -> Point:
 
 
 def is_diagonal(line: Line) -> bool:
+    assert len(line) == 2
     return line[0][0] != line[1][0] and line[0][1] != line[1][1]
 
 
@@ -63,9 +67,9 @@ def get_range(a: int, b: int) -> list[int]:
         return list(range(a, b-1, -1))
 
 
-def find_overlaps(lines: list[Line]) -> list[Point]:
-    points = [point for line in lines for point in line]
-    return [point for point, count in Counter(points).items() if count > 1]
+def find_overlaps(lines: list[Line]) -> set[Point]:
+    points = list(flatten(lines))
+    return {point for (point, count) in Counter(points).items() if count > 1}
 
 
 def read_input(filename):
