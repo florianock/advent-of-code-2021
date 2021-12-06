@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from collections import namedtuple
 
 Row = list[int]
 Col = list[int]
 Board = list[Row]
+Result = namedtuple("Result", ["round", "score"])
 
 
 def main(file):
@@ -24,21 +26,21 @@ def get_score_for_worst_board(inputs: str) -> int:
 
 
 def get_ultimate_score(boards: list[Board], numbers: list[int], i_want_to_win: bool = True) -> int:
-    results = [result for result in [get_result(board, numbers) for board in boards] if result["round"] > -1]
-    results.sort(key=lambda result: result["round"])
+    results = [result for result in [get_result(board, numbers) for board in boards] if result.round > -1]
+    results.sort(key=lambda r: r.round)
     if i_want_to_win:
         best_result = results[0]
     else:
         best_result = results[-1]
-    return numbers[best_result["round"]] * best_result["score"]
+    return numbers[best_result.round] * best_result.score
 
 
-def get_result(board: Board, numbers: list[int]) -> dict:
+def get_result(board: Board, numbers: list[int]) -> Result:
     for n in range(len(numbers)):
         numbers_so_far = numbers[0:n+1]
         if rows_bingo(board, numbers_so_far) or cols_bingo(board, numbers_so_far):
-            return {"round": n, "score": get_remaining_board_value(board, numbers_so_far)}
-    return dict.fromkeys(['round', 'score'], -1)
+            return Result(n, get_remaining_board_value(board, numbers_so_far))
+    return Result(-1, -1)
 
 
 def rows_bingo(board: Board, numbers: list[int]) -> bool:
@@ -46,7 +48,7 @@ def rows_bingo(board: Board, numbers: list[int]) -> bool:
 
 
 def cols_bingo(board: Board, numbers: list[int]) -> bool:
-    return any([bingo(col, numbers) for col in invert(board)])
+    return any([bingo(col, numbers) for col in transpose(board)])
 
 
 def bingo(numbers_from_board: list[int], drawn_numbers: list[int]) -> bool:
@@ -58,7 +60,7 @@ def get_remaining_board_value(board: Board, numbers: list[int]):
     return sum(set(flattened_board) - set(numbers))
 
 
-def invert(board: Board) -> list[Col]:
+def transpose(board: Board) -> list[Col]:
     return [*map(list, zip(*board))]
 
 
