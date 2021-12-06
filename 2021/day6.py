@@ -12,34 +12,35 @@ def main(file):
 
 
 def count_after_days(inputs: str, days: int) -> int:
-    initial = get_initial_fish_counts(inputs)
-    final_count = reduce(tick, range(days), initial)
-    return sum(final_count)
-
-
-def tick(counts: list[int], _: int) -> list[int]:
-    result = counts[1:] + counts[0:1]
-    result[6] += counts[0]
-    return result
-
-
-def get_initial_fish_counts(inputs: str) -> list[int]:
-    initial_counts = [0] * 9
     fish = [int(x) for x in inputs.split(',')]
-    for f in fish:
-        initial_counts[f] += 1
-    return initial_counts
+    start = reduce(tally, fish, [0] * 9)
+    final = count_down(start, days)
+    return sum(final)
+
+
+def tally(counts: list[int], item: int) -> list[int]:
+    counts[item] += 1
+    return counts
+
+
+def count_down(counts: list[int], days: int) -> list[int]:
+    new_counts = counts[1:] + counts[0:1]
+    new_counts[6] += counts[0]
+    if days > 1:
+        return count_down(new_counts, days - 1)
+    else:
+        return new_counts
 
 
 def read_input(filename):
     with open(filename) as f:
-        contents = f.read().strip()
-        return contents
+        return f.read().strip()
 
 
 example = """
 3,4,3,1,2
 """.strip()
+
 
 if __name__ == "__main__":
     main('day-6-input.txt')
