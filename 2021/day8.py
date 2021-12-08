@@ -52,21 +52,22 @@ def count_outputs(inputs: str) -> int:
     count = 0
     displays = read_inputs(inputs)
     for occ, out in displays:
-        first_key = find_edges_by_unique_counts(occ)
-        key = find_edges_by_digit_length(occ, first_key)
+        key = find_edges_by_unique_counts(occ)
+        key = find_edges_by_digit_length(occ, key)
         result = []
         for o in out:
             d = decode(o, key)
             result.append(str(d))
-        my_string = "".join(result)
-        count += int(my_string)
+        output_digits = "".join(result)
+        display(output_digits)
+        count += int(output_digits)
     return count
 
 
 def find_edges_by_unique_counts(digits: list[str]) -> str:
     key = '.' * 7
     counts_and_edges = Counter("".join(digits).replace(' ', '')).most_common()
-    known_unique_counts = [(0, -2), (-1, 4), (-2, 1)]
+    known_unique_counts = [(0, 5), (-1, 4), (-2, 1)]
     for counter_idx, key_idx in known_unique_counts:
         char = counts_and_edges[counter_idx][0]
         key = str_replace_at_index(key, key_idx, char)
@@ -76,11 +77,10 @@ def find_edges_by_unique_counts(digits: list[str]) -> str:
 def find_edges_by_digit_length(digits: list[str], key: str) -> str:
     easy = [x for x in digits if len(x) in [2, 3, 4, 7]]
     lengths_and_edges = [(2, 2), (3, 0), (4, 3), (7, 6)]
-    result = key
     for length, key_idx in lengths_and_edges:
-        char = (set(get_item_by_length(easy, length)) - set(result)).pop()
-        result = str_replace_at_index(result, key_idx, char)
-    return result
+        char = (set(get_item_by_length(easy, length)) - set(key)).pop()
+        key = str_replace_at_index(key, key_idx, char)
+    return key
 
 
 def get_item_by_length(items: list[str], length: int) -> str:
@@ -97,17 +97,33 @@ def str_replace_at_index(string: str, i: int, c: str) -> str:
 
 
 def decode(digit: str, key: str) -> int:
-    normal = "abcdefg"
+    normal_edges = normal_digits[8]
     answer = ""
     for c in digit:
         i = key.index(c)
-        answer += normal[i]
+        answer += normal_edges[i]
     answer = "".join(sorted(answer))
-    display(answer)
     return normal_digits.index(answer)
 
 
-def display(digit: str):
+def display(number: str):
+    grid = []
+    for c in number:
+        d = normal_digits[int(c)]
+        grid = add_to_grid(grid, get_display_digit(d))
+    print("\n".join(grid))
+
+
+def add_to_grid(grid: list[str], digit: list[str]) -> list[str]:
+    if not grid:
+        return digit
+    result = []
+    for i, row in enumerate(grid):
+        result.append(row + "\t" + digit[i])
+    return result
+
+
+def get_display_digit(digit: str) -> list[str]:
     h = '_'
     v = '|'
     grid = ["   ", "   ", "   "]
@@ -125,7 +141,7 @@ def display(digit: str):
         grid[2] = str_replace_at_index(grid[2], 2, v)
     if 'g' in digit:
         grid[2] = str_replace_at_index(grid[2], 1, h)
-    print("\n".join(grid))
+    return grid
 
 
 example = """
@@ -140,6 +156,7 @@ bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbg
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 """.strip()
+
 
 #   8      5   2      3    7    9       6    4     0    1      5     3     5     3
 example2 = """
