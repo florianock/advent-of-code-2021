@@ -52,8 +52,8 @@ def count_outputs(inputs: str) -> int:
     count = 0
     displays = read_inputs(inputs)
     for occ, out in displays:
-        first_key = get_edges_by_counts(occ)
-        key = get_edges_by_length(occ, first_key)
+        first_key = find_edges_by_unique_counts(occ)
+        key = find_edges_by_digit_length(occ, first_key)
         result = []
         for o in out:
             d = decode(o, key)
@@ -63,30 +63,24 @@ def count_outputs(inputs: str) -> int:
     return count
 
 
-def get_edges_by_counts(ds: list[str]) -> str:
-    key = ['.'] * 7
-    dist = Counter("".join(ds).replace(' ', '')).most_common()
-    f = dist[0][0]
-    b = dist[-1][0]
-    e = dist[-2][0]
-    key[-2] = f
-    key[4] = b
-    key[1] = e
-    return "".join(key)
+def find_edges_by_unique_counts(digits: list[str]) -> str:
+    key = '.' * 7
+    counts_and_edges = Counter("".join(digits).replace(' ', '')).most_common()
+    known_unique_counts = [(0, -2), (-1, 4), (-2, 1)]
+    for counter_idx, key_idx in known_unique_counts:
+        char = counts_and_edges[counter_idx][0]
+        key = str_replace_at_index(key, key_idx, char)
+    return key
 
 
-def get_edges_by_length(ds: list[str], key: str) -> str:
-    kl = list(key)
-    easy = [x for x in ds if len(x) in [2, 3, 4, 7]]
-    c = set(get_item_by_length(easy, 2)) - set(kl)
-    kl[2] = c.pop()
-    a = set(get_item_by_length(easy, 3)) - set(kl)
-    kl[0] = a.pop()
-    d = set(get_item_by_length(easy, 4)) - set(kl)
-    kl[3] = d.pop()
-    g = set(get_item_by_length(easy, 7)) - set(kl)
-    kl[-1] = g.pop()
-    return "".join(kl)
+def find_edges_by_digit_length(digits: list[str], key: str) -> str:
+    easy = [x for x in digits if len(x) in [2, 3, 4, 7]]
+    lengths_and_edges = [(2, 2), (3, 0), (4, 3), (7, 6)]
+    result = key
+    for length, key_idx in lengths_and_edges:
+        char = (set(get_item_by_length(easy, length)) - set(result)).pop()
+        result = str_replace_at_index(result, key_idx, char)
+    return result
 
 
 def get_item_by_length(items: list[str], length: int) -> str:
