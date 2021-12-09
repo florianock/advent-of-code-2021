@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
+# noinspection PyUnresolvedReferences
+from aocd import data, submit
+from collections import namedtuple
 import itertools
 import operator
 from functools import reduce
-
-# noinspection PyUnresolvedReferences
-from aocd import data, submit
-from collections import Counter, namedtuple
 
 flatten = itertools.chain.from_iterable
 
 Point = namedtuple("Point", ["row", "col", "height"])
 Row = list[Point]
-Col = list[Point]
 Basin = set[Point]
-Floor = set[Point]
+Floor = list[Row]
 
 
 def main():
@@ -29,10 +27,12 @@ def main():
 
 def process_inputs(inputs: str) -> Floor:
     rows_of_ints = [[int(y) for y in x] for x in inputs.split('\n')]
-    output = set()
+    output = Floor()
     for i, row in enumerate(rows_of_ints):
+        points_row = Row()
         for j, height in enumerate(row):
-            output.add(Point(i, j, height))
+            points_row.append(Point(i, j, height))
+        output.append(points_row)
     return output
 
 
@@ -45,47 +45,59 @@ def solve1(inputs: str) -> int:
 
 def solve2(inputs: str) -> int:
     cave_floor = process_inputs(inputs)
-    low_points = find_low_points(cave_floor)
-    max_height = max({p.height for p in cave_floor})
-    high_points = {high for high in cave_floor if high.height == max_height}
-    valid_points = cave_floor - high_points
-    basins = [find_basin(valid_points, x) for x in low_points]
+    basins = find_basins(cave_floor)
     basins.sort(key=lambda x: len(x), reverse=True)
     return reduce(operator.mul, [len(b) for b in basins[0:3]], 1)
 
 
-def find_basin(search_space: set[Point], point: Point) -> Basin:
-    todo = {point}
-    processed = set()
-    print("finding basin...")
-    while todo - processed:
-        unknown = todo - processed
-        p = unknown.pop()
-        neighbors = get_neighbors(p, search_space)
-        todo.update(neighbors)
-        processed.add(p)
-    return processed
+def find_basins(cave_floor):
+    low_points = find_low_points(cave_floor)
+    high_points = find_high_points(cave_floor)
+    basin_points = set(flatten(cave_floor)) - high_points
+    basins = [find_basin(basin_points, x, cave_floor) for x in low_points]
+    return basins
 
 
 def find_low_points(cave_floor: Floor) -> set[Point]:
     low_points = set()
-    print("finding low points...")
-    for point in cave_floor:
-        neighbors = get_neighbors(point, cave_floor)
-        if is_low_point(point, neighbors):
-            low_points.add(point)
+    for row in cave_floor:
+        for point in row:
+            neighbors = get_neighbors(point, cave_floor)
+            if is_low_point(point, neighbors):
+                low_points.add(point)
+                print(point)
     return low_points
 
 
-def is_low_point(point: Point, neighbors: set[Point]) -> bool:
+def find_high_points(cave_floor: Floor) -> set[Point]:
+    max_height = max({p.height for p in flatten(cave_floor)})
+    return {p for p in flatten(cave_floor) if p.height == max_height}
+
+
+def find_basin(basin_points: set[Point], point: Point, cave_floor: Floor) -> Basin:
+    unexplored = {point}
+    explored = Basin()
+    while unexplored - explored:
+        p = (unexplored - explored).pop()
+        neighbors = {n for n in get_neighbors(p, cave_floor) if n in basin_points}
+        unexplored.update({n for n in neighbors if n not in explored})
+        explored.add(p)
+    print(explored)
+    return explored
+
+
+def is_low_point(point: Point, neighbors: iter) -> bool:
     return all(map(lambda x: point.height < x.height, neighbors))
 
 
 def get_neighbors(point: Point, cave_floor: Floor) -> set[Point]:
-    return {p for
-            p in cave_floor
-            if (p.row == point.row and (p.col == point.col - 1 or p.col == point.col + 1))
-            or (p.col == point.col and (p.row == point.row - 1 or p.row == point.row + 1))}
+    max_row = len(cave_floor)
+    max_col = len(cave_floor[0])
+    imaginary_neighbors = [(point.row - 1, point.col), (point.row + 1, point.col),
+                           (point.row, point.col - 1), (point.row, point.col + 1)]
+    return {cave_floor[r][c]
+            for r, c in imaginary_neighbors
+            if 0 <= r < max_row and 0 <= c < max_col}
 
 
 example = """
@@ -95,6 +107,7 @@ example = """
 8767896789
 9899965678
 """.strip()
+
 
 if __name__ == "__main__":
     main()
