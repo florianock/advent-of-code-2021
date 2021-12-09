@@ -33,6 +33,7 @@ def process_inputs(inputs: str) -> Floor:
         for j, height in enumerate(row):
             points_row.append(Point(i, j, height))
         output.append(points_row)
+    display(output)
     return output
 
 
@@ -65,7 +66,7 @@ def find_low_points(cave_floor: Floor) -> set[Point]:
             neighbors = get_neighbors(point, cave_floor)
             if is_low_point(point, neighbors):
                 low_points.add(point)
-                print(point)
+                # print(point)
     return low_points
 
 
@@ -82,7 +83,7 @@ def find_basin(basin_points: set[Point], point: Point, cave_floor: Floor) -> Bas
         neighbors = {n for n in get_neighbors(p, cave_floor) if n in basin_points}
         unexplored.update({n for n in neighbors if n not in explored})
         explored.add(p)
-    print(explored)
+    # print(explored)
     return explored
 
 
@@ -93,11 +94,25 @@ def is_low_point(point: Point, neighbors: iter) -> bool:
 def get_neighbors(point: Point, cave_floor: Floor) -> set[Point]:
     max_row = len(cave_floor)
     max_col = len(cave_floor[0])
-    imaginary_neighbors = [(point.row - 1, point.col), (point.row + 1, point.col),
+    neighbors = [(point.row - 1, point.col), (point.row + 1, point.col),
                            (point.row, point.col - 1), (point.row, point.col + 1)]
     return {cave_floor[r][c]
-            for r, c in imaginary_neighbors
+            for r, c in neighbors
             if 0 <= r < max_row and 0 <= c < max_col}
+
+
+def display(cave_floor: Floor):
+    rows, cols = len(cave_floor), len(cave_floor[0])
+    grid = [['.' for i in range(cols)] for j in range(rows)]
+    for row in cave_floor:
+        for point in row:
+            grid[point.row][point.col] = draw(point.height)
+    for line in grid:
+        print(" ".join(line))
+
+
+def draw(i: int) -> str:
+    return "x*&$!;:,.#"[i]
 
 
 example = """
