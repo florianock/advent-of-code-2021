@@ -76,8 +76,7 @@ def find_high_points(cave_floor: Floor) -> set[Point]:
 
 
 def find_basin(basin_points: set[Point], point: Point, cave_floor: Floor) -> Basin:
-    unexplored = {point}
-    explored = Basin()
+    unexplored, explored = {point}, Basin()
     while unexplored - explored:
         p = (unexplored - explored).pop()
         neighbors = {n for n in get_neighbors(p, cave_floor) if n in basin_points}
@@ -95,7 +94,7 @@ def get_neighbors(point: Point, cave_floor: Floor) -> set[Point]:
     max_row = len(cave_floor)
     max_col = len(cave_floor[0])
     neighbors = [(point.row - 1, point.col), (point.row + 1, point.col),
-                           (point.row, point.col - 1), (point.row, point.col + 1)]
+                 (point.row, point.col - 1), (point.row, point.col + 1)]
     return {cave_floor[r][c]
             for r, c in neighbors
             if 0 <= r < max_row and 0 <= c < max_col}
@@ -103,16 +102,20 @@ def get_neighbors(point: Point, cave_floor: Floor) -> set[Point]:
 
 def display(cave_floor: Floor):
     rows, cols = len(cave_floor), len(cave_floor[0])
-    grid = [['.' for i in range(cols)] for j in range(rows)]
+    canvas = [['.' for i in range(cols)] for j in range(rows)]
     for row in cave_floor:
         for point in row:
-            grid[point.row][point.col] = draw(point.height)
-    for line in grid:
-        print(" ".join(line))
+            canvas[point.row][point.col] = draw(point.height)
+    for line in canvas:
+        print("".join(line))
 
 
 def draw(i: int) -> str:
-    return "x*&$!;:,.#"[i]
+    max_input = 10
+    assert 0 <= i < max_input
+    grayscale = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'."
+    idx = round(i * len(grayscale) / max_input) + (len(grayscale) // max_input)
+    return grayscale[idx]
 
 
 example = """
