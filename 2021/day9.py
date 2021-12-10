@@ -51,7 +51,7 @@ def solve2(inputs: str) -> int:
     return reduce(operator.mul, [len(b) for b in basins[0:3]], 1)
 
 
-def find_basins(cave_floor):
+def find_basins(cave_floor: Floor) -> list[Basin]:
     low_points = find_low_points(cave_floor)
     high_points = find_high_points(cave_floor)
     basin_points = set(flatten(cave_floor)) - high_points

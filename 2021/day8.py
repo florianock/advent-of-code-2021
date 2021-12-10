@@ -18,6 +18,42 @@ def main():
     assert ex3 == 61229, f"expected 61229, but got {ex3}"
     answer2 = count_outputs(data)
     assert answer2 == 908067, f"expected 908067, but got {answer2}"
+    # alt(example)
+
+
+# alternatively, try using bitmasks
+
+
+# only on Python 3.10; https://www.reddit.com/r/adventofcode/comments/rbj87a/2021_day_8_solutions/hnoyy04/?utm_source=reddit&utm_medium=web2x&context=3
+# def alt(inputs: str):
+#     s = 0
+#     for x, y in [x.split('|') for x in inputs.split('\n')]:  # split signal and output
+#         l = {len(s): set(s) for s in x.split()}  # get number of segments
+#         n = ''
+#         for o in map(set, y.split()):  # loop over output digits
+#             match len(o), len(o & l[4]), len(o & l[2]):  # mask with known digits
+#                 case 2, _, _:
+#                     n += '1'
+#                 case 3, _, _:
+#                     n += '7'
+#                 case 4, _, _:
+#                     n += '4'
+#                 case 7, _, _:
+#                     n += '8'
+#                 case 5, 2, _:
+#                     n += '2'
+#                 case 5, 3, 1:
+#                     n += '5'
+#                 case 5, 3, 2:
+#                     n += '3'
+#                 case 6, 4, _:
+#                     n += '9'
+#                 case 6, 3, 1:
+#                     n += '6'
+#                 case 6, 3, 2:
+#                     n += '0'
+#         s += int(n)
+#     print(s)
 
 
 def read_inputs(inputs: str) -> list[tuple[list[str], list[str]]]:
@@ -67,7 +103,7 @@ def count_outputs(inputs: str) -> int:
 def find_edges_by_unique_counts(digits: list[str]) -> str:
     key = '.' * 7
     counts_and_edges = Counter("".join(digits).replace(' ', '')).most_common()
-    known_unique_counts = [(0, 5), (-1, 4), (-2, 1)]
+    known_unique_counts = [(0, 5), (-2, 1), (-1, 4)]
     for counter_idx, key_idx in known_unique_counts:
         char = counts_and_edges[counter_idx][0]
         key = str_replace_at_index(key, key_idx, char)
