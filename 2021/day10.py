@@ -9,7 +9,7 @@ from colorama import Fore, Style, init
 from aocd import data, submit
 
 Stack = list[str]
-init(autoreset=True)
+init(autoreset=True)  # init colorama
 
 
 @dataclass
@@ -31,7 +31,7 @@ class SyntaxCheckResult:
         return count
 
     def is_corrupted(self) -> bool:
-        return self.corrupt_char > 0
+        return self.corrupt_char > -1
 
     def display(self) -> str:
         padding = 140
