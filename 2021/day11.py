@@ -3,6 +3,9 @@
 from aocd import data, submit
 from typing import Deque
 
+Group = list[list[int]]
+Neighborhood = set[(int, int)]
+
 
 def main():
     ex1, ex2 = solve(example)
@@ -33,30 +36,30 @@ def solve(inputs: str) -> (int, int):
     return answer1, answer2
 
 
-def tick(group: list[list[int]]) -> list[list[int]]:
+def tick(group: Group) -> Group:
     next_group = [[x for x in row] for row in group]  # we want tick to be a pure function
-    queue = Deque[tuple[int, int]]()
+    affected = []
     for r, row in enumerate(next_group):
         for c, _ in enumerate(row):
-            queue.extend(update_octopus(r, c, next_group))
-    while queue:
-        row, col = queue.popleft()
+            affected.extend(update_octopus(r, c, next_group))
+    while affected:
+        row, col = affected.pop()
         if next_group[row][col] == 0:
             continue
-        queue.extend(update_octopus(row, col, next_group))
+        affected.extend(update_octopus(row, col, next_group))
     return next_group
 
 
-def update_octopus(row: int, col: int, group: list[list[int]]) -> list[(int, int)]:
+def update_octopus(row: int, col: int, group: Group) -> Neighborhood:
     if group[row][col] == 9:
         group[row][col] = 0
         return get_neighbors(row, col, group)
     else:
         group[row][col] += 1
-        return []
+        return set()
 
 
-def get_neighbors(r: int, c: int, group: list[list[int]]) -> list[(int, int)]:
+def get_neighbors(r: int, c: int, group: Group) -> Neighborhood:
     num_rows = len(group)
     num_cols = len(group[0])
     neighbors = [
@@ -64,10 +67,10 @@ def get_neighbors(r: int, c: int, group: list[list[int]]) -> list[(int, int)]:
         (r,   c-1),           (r,   c+1),
         (r+1, c-1), (r+1, c), (r+1, c+1)
     ]
-    return [(n, m) for n, m in neighbors if 0 <= n < num_rows and 0 <= m < num_cols]
+    return {(n, m) for n, m in neighbors if 0 <= n < num_rows and 0 <= m < num_cols}
 
 
-def display(group: list[list[int]], day: int):
+def display(group: Group, day: int):
     output = []
     for row in group:
         output.append("".join([str(x) for x in row]))
