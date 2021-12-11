@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # noinspection PyUnresolvedReferences
 from aocd import data, submit
-from typing import Deque
 
 Group = list[list[int]]
 Neighborhood = set[(int, int)]
