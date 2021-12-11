@@ -5,77 +5,81 @@ from typing import Deque
 
 
 def main():
-    ex1 = solve1(example)
+    ex1, ex2 = solve(example)
     assert ex1 == 1656, f"expected 1656, but got {ex1}"
-    answer1 = solve1(data)
-    assert answer1 == 1661, f"expected 1661, but got {answer1}"
-    ex2 = solve2(example)
     assert ex2 == 195, f"expected 195, but got {ex2}"
-    answer2 = solve2(data)
+    answer1, answer2 = solve(data)
+    assert answer1 == 1661, f"expected 1661, but got {answer1}"
     assert answer2 == 334, f"expected 334, but got {answer2}"
 
 
-def solve1(inputs: str) -> int:
+def solve(inputs: str) -> (int, int):
+    max_days = 1000
     group = [[int(x) for x in row] for row in inputs.split('\n')]
     num_rows = len(group)
     num_cols = len(group[0])
+    group_size = num_rows * num_cols
+    answer1 = answer2 = 0
+    for day in range(1, max_days+1):
+        group = tick(group)
+        display(group, day)
+        flash_count = sum([sum([1 for x in row if x == 0]) for row in group])
+        if day < 101:
+            answer1 += flash_count
+        if flash_count == group_size:
+            answer2 = day
+        if answer2 and day >= 101:
+            break
+    return answer1, answer2
+
+
+def tick(group: list[list[int]]) -> list[list[int]]:
+    next_group = [[x for x in row] for row in group]  # we want tick to be a pure function
     queue = Deque[tuple[int, int]]()
-    flash_count = 0
-    for day in range(100):
-        day_flash_count = 0
-        for r, row in enumerate(group):
-            for c, _ in enumerate(row):
-                group[r][c] += 1
-                if group[r][c] == 10:
-                    queue.extend(get_neighbors(r, c, num_rows, num_cols))
-        while queue:
-            row, col = queue.pop()
-            group[row][col] += 1
-            if group[row][col] == 10:
-                queue.extend(get_neighbors(row, col, num_rows, num_cols))
-        for r, row in enumerate(group):
-            for c, octopus in enumerate(row):
-                if octopus > 9:
-                    group[r][c] = 0
-                    day_flash_count += 1
-        flash_count += day_flash_count
-    return flash_count
+    for r, row in enumerate(next_group):
+        for c, _ in enumerate(row):
+            queue.extend(update_octopus(r, c, next_group))
+    while queue:
+        row, col = queue.popleft()
+        if next_group[row][col] == 0:
+            continue
+        queue.extend(update_octopus(row, col, next_group))
+    return next_group
 
 
-def solve2(inputs: str) -> int:
-    group = [[int(x) for x in row] for row in inputs.split('\n')]
+def update_octopus(row: int, col: int, group: list[list[int]]) -> list[(int, int)]:
+    if group[row][col] == 9:
+        group[row][col] = 0
+        return get_neighbors(row, col, group)
+    else:
+        group[row][col] += 1
+        return []
+
+
+def get_neighbors(r: int, c: int, group: list[list[int]]) -> list[(int, int)]:
     num_rows = len(group)
     num_cols = len(group[0])
-    queue = Deque[tuple[int, int]]()
-    for day in range(1000):
-        day_flash_count = 0
-        for r, row in enumerate(group):
-            for c, _ in enumerate(row):
-                group[r][c] += 1
-                if group[r][c] == 10:
-                    queue.extend(get_neighbors(r, c, num_rows, num_cols))
-        while queue:
-            row, col = queue.pop()
-            group[row][col] += 1
-            if group[row][col] == 10:
-                queue.extend(get_neighbors(row, col, num_rows, num_cols))
-        for r, row in enumerate(group):
-            for c, octopus in enumerate(row):
-                if octopus > 9:
-                    group[r][c] = 0
-                    day_flash_count += 1
-        if day_flash_count == num_rows * num_cols:
-            return day + 1
-    return -1
-
-
-def get_neighbors(r: int, c: int, num_rows: int, num_cols: int) -> list[(int, int)]:
     neighbors = [
         (r-1, c-1), (r-1, c), (r-1, c+1),
         (r,   c-1),           (r,   c+1),
         (r+1, c-1), (r+1, c), (r+1, c+1)
     ]
-    return [(r, c) for r, c in neighbors if 0 <= r < num_rows and 0 <= c < num_cols]
+    return [(n, m) for n, m in neighbors if 0 <= n < num_rows and 0 <= m < num_cols]
+
+
+def display(group: list[list[int]], day: int):
+    flo = []
+    for row in group:
+        flo.append("".join([str(x) for x in row]))
+    clear()
+    print("\n".join(flo) + "\n\nDay: " + str(day))
+
+
+def clear():
+    from time import sleep
+    import os
+    sleep(0.05)
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 example = """
