@@ -68,11 +68,11 @@ def get_neighbors(r: int, c: int, group: list[list[int]]) -> list[(int, int)]:
 
 
 def display(group: list[list[int]], day: int):
-    flo = []
+    output = []
     for row in group:
-        flo.append("".join([str(x) for x in row]))
+        output.append("".join([str(x) for x in row]))
     clear()
-    print("\n".join(flo) + "\n\nDay: " + str(day))
+    print("\n".join(output) + "\n\nDay: " + str(day))
 
 
 def clear():
