@@ -18,9 +18,6 @@ def main():
 def solve(inputs: str) -> (int, int):
     max_days = 1000
     group = [[int(x) for x in row] for row in inputs.split('\n')]
-    num_rows = len(group)
-    num_cols = len(group[0])
-    group_size = num_rows * num_cols
     answer1 = answer2 = 0
     for day in range(1, max_days+1):
         group = tick(group)
@@ -28,7 +25,7 @@ def solve(inputs: str) -> (int, int):
         flash_count = sum([sum([1 for x in row if x == 0]) for row in group])
         if day < 101:
             answer1 += flash_count
-        if flash_count == group_size:
+        if flash_count == len(group) * len(group[0]):
             answer2 = day
         if answer2 and day >= 101:
             break
