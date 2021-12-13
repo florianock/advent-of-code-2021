@@ -52,9 +52,9 @@ def complete_line(line: Line) -> Line:
     xs = get_range(line[0][0], line[1][0])
     ys = get_range(line[0][1], line[1][1])
     if len(xs) == 1:
-        xs = xs * len(ys)
+        xs *= len(ys)
     elif len(ys) == 1:
-        ys = ys * len(xs)
+        ys *= len(xs)
     return list(zip(xs, ys))
 
 

@@ -21,7 +21,7 @@ def main():
     # alt(example)
 
 
-# alternatively, try using bitmasks
+# TODO alternatively, try using bitmasks
 
 
 # only on Python 3.10; https://www.reddit.com/r/adventofcode/comments/rbj87a/2021_day_8_solutions/hnoyy04/?utm_source=reddit&utm_medium=web2x&context=3

@@ -2,9 +2,9 @@
 # noinspection PyUnresolvedReferences
 from aocd import data, submit
 
-
+# TODO clean up
 def main():
-    paper, instructions = read_input(data)
+    paper, instructions = read_input(example)
     answer1 = 0
     for x, i in instructions:
         paper = fold(paper, i, x)
@@ -40,11 +40,10 @@ letters = {
 
 
 def fold(a: list[list[bool]], i: int, fold_along: str) -> list[list[bool]]:
-    to_fold = a
     if fold_along == 'y':
-        to_fold = transpose(a)
+        a = transpose(a)
     result = []
-    for row in to_fold:
+    for row in a:
         left = row[:i]
         right = row[i+1:]
         right.reverse()
@@ -69,9 +68,9 @@ def read_input(inputs: str) -> (list[list[bool]], list[(str, int)]):
         nums.append((int(cs[0]), int(cs[1])))
     xs, ys = ([i for i, j in nums],
               [j for i, j in nums])
-    matrix = [[False for i in range(max(xs)+1)] for row in range(max(ys)+1)]
-    for n in nums:
-        matrix[n[1]][n[0]] = True
+    matrix = [[True if (x, y) in nums else False for x in range(max(xs)+1)] for y in range(max(ys)+1)]
+    # for n in nums:
+    #     matrix[n[1]][n[0]] = True
     i_lines = [i for i in folding.split('\n')]
     result2 = [i.replace('fold along ', '') for i in i_lines]
     result3 = []
