@@ -115,7 +115,7 @@ def draw(i: int) -> str:
     assert 0 <= i < max_input
     grayscale = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'."
     idx = round(i * len(grayscale) / max_input) + (len(grayscale) // max_input)
-    return grayscale[idx]
+    return grayscale[idx]*2
 
 
 example = """
