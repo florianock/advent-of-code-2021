@@ -31,11 +31,11 @@ def solve(inputs: str, steps: int) -> int:
 def create_polymers(pairs: Counter, rules: PolymerRules) -> (Counter, Counter):
     new_pairs = Counter()
     polymers = Counter()
-    for p in pairs:
-        polymer = rules[p]
-        polymers[polymer] += pairs[p]
-        for e in [(p[0], polymer), (polymer, p[1])]:
-            new_pairs[e] += pairs[p]
+    for (p1, p2), count in pairs.items():
+        polymer = rules[(p1, p2)]
+        polymers[polymer] += count
+        for e in [(p1, polymer), (polymer, p2)]:
+            new_pairs[e] += count
     return new_pairs, polymers
 
 

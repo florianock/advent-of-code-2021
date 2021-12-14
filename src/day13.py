@@ -4,13 +4,13 @@ from aocd import data, submit
 
 # TODO clean up
 def main():
-    paper, instructions = read_input(example)
+    paper, instructions = read_input(data)
     answer1 = 0
     for x, i in instructions:
         paper = fold(paper, i, x)
         if answer1 == 0:
             answer1 = sum([sum(r) for r in paper])
-    display(paper)
+        display(paper)
     print(answer1)
 
     # for answer2: squeeze eyes and read output
@@ -83,7 +83,7 @@ def read_input(inputs: str) -> (list[list[bool]], list[(str, int)]):
 def display(matrix: list[list[bool]]):
     builder = []
     for row in matrix:
-        builder.append("".join(["#" if x else "." for x in row]))
+        builder.append("".join(["##" if x else "  " for x in row]))
     print("\n".join(builder))
 
 
