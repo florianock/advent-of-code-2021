@@ -16,7 +16,7 @@ def main():
 
 
 def solve(inputs: str) -> (int, int):
-    max_days = 1000
+    max_days = 500
     group = [[int(x) for x in row] for row in inputs.split('\n')]
     answer1 = answer2 = 0
     for day in range(1, max_days+1):
@@ -25,7 +25,7 @@ def solve(inputs: str) -> (int, int):
         flash_count = sum([sum([1 for x in row if x == 0]) for row in group])
         if day < 101:
             answer1 += flash_count
-        if flash_count == len(group) * len(group[0]):
+        if flash_count == len(group) * len(group[0]) and not answer2:
             answer2 = day
         if answer2 and day >= 101:
             break
@@ -33,7 +33,7 @@ def solve(inputs: str) -> (int, int):
 
 
 def tick(group: Group) -> Group:
-    next_group = [[x for x in row] for row in group]  # we want tick to be a pure function
+    next_group = [[x for x in row] for row in group]  # tick must be a pure function
     affected = []
     for r, row in enumerate(next_group):
         for c, _ in enumerate(row):
@@ -69,7 +69,7 @@ def get_neighbors(r: int, c: int, group: Group) -> Neighborhood:
 def display(group: Group, day: int):
     output = []
     for row in group:
-        output.append("".join([str(x) for x in row]))
+        output.append("".join(["\u2588\u2588" if x == 0 else "  " for x in row]))
     clear()
     print("\n".join(output) + "\n\nDay: " + str(day))
 
