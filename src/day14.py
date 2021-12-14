@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # noinspection PyUnresolvedReferences
 from aocd import data, submit
-from collections import Counter, defaultdict
+from collections import Counter
 from itertools import pairwise
 
 PolymerRules = dict[tuple[str, str], str]
@@ -25,6 +25,7 @@ def solve(inputs: str, steps: int) -> int:
     for i in range(1, steps+1):
         pairs, new_polymers = create_polymers(pairs, rules)
         polymers.update(new_polymers)
+        display(polymers, i)
     return max(polymers.values()) - min(polymers.values())
 
 
@@ -45,8 +46,25 @@ def read_inputs(inputs: str) -> (str, PolymerRules):
     return lines[0], rules
 
 
+def display(polymers: Counter, i):
+    clear()
+    print(f"Step {i}")
+    print(f"Total: {sum(polymers.values())}")
+    print(f"Size: {sum(polymers.values()) // 1000000000000} TB\n")
+    for polymer, count in polymers.items():
+        print(f"{polymer}: {count}")
+    print('\n')
+
+
+def clear():
+    from time import sleep
+    import os
+    sleep(0.05)
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 example = """
-NNCBS
+NNCB
 
 CH -> B
 HH -> N
