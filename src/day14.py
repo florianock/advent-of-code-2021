@@ -19,9 +19,9 @@ def main():
 
 
 def solve(inputs: str, steps: int) -> int:
-    template, rules = read_inputs(inputs)
-    pairs = Counter(pairwise(template))
-    polymers = Counter(template)
+    start_template, rules = read_inputs(inputs)
+    pairs = Counter(pairwise(start_template))
+    polymers = Counter(start_template)
     for i in range(1, steps+1):
         pairs, new_polymers = create_polymers(pairs, rules)
         polymers.update(new_polymers)
@@ -34,21 +34,21 @@ def create_polymers(pairs: Counter, rules: PolymerRules) -> (Counter, Counter):
     for (p1, p2), count in pairs.items():
         polymer = rules[(p1, p2)]
         polymers[polymer] += count
-        for e in [(p1, polymer), (polymer, p2)]:
-            new_pairs[e] += count
+        for pair in [(p1, polymer), (polymer, p2)]:
+            new_pairs[pair] += count
     return new_pairs, polymers
 
 
 def read_inputs(inputs: str) -> (str, PolymerRules):
     lines = inputs.split('\n')
-    template = {(a[0], a[1]): a[6] for a in lines[2:]}
-    return lines[0], template
+    rules = {(a[0], a[1]): a[6] for a in lines[2:]}
+    return lines[0], rules
 
 
 example = """
-NNCB
+NNCBS
 
-CH -> B  # CB, BH
+CH -> B
 HH -> N
 CB -> H
 NH -> C
