@@ -8,6 +8,8 @@ from colorama import Fore, Style, init
 # noinspection PyUnresolvedReferences
 from aocd import data, submit
 
+# --- Day 10: Syntax Scoring ---
+
 Stack = list[str]
 init(autoreset=True)  # init colorama
 

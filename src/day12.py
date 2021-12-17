@@ -4,6 +4,8 @@ from collections import defaultdict
 
 from aocd import data, submit
 
+# --- Day 12: Passage Pathing ---
+
 
 def main():
     ex1a = len(get_paths(example1))

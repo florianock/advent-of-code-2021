@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from functools import reduce
 
+# --- Day 6: Lanternfish ---
+
 
 def main(file):
     inputs = read_input(file)

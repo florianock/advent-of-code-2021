@@ -4,6 +4,8 @@ from aocd import data, submit
 from collections import Counter
 from itertools import pairwise
 
+# --- Day 14: Extended Polymerization ---
+
 PolymerRules = dict[tuple[str, str], str]
 
 

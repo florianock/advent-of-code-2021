@@ -2,6 +2,9 @@
 # noinspection PyUnresolvedReferences
 from aocd import data, submit
 
+# --- Day 11: Dumbo Octopus ---
+
+
 Group = list[list[int]]
 Neighborhood = set[(int, int)]
 

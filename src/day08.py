@@ -3,6 +3,7 @@
 from aocd import data, submit
 from collections import Counter
 
+# --- Day 8: Seven Segment Search ---
 
 normal_digits = ["abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg"]
 

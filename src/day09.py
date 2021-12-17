@@ -6,6 +6,9 @@ import itertools
 import operator
 from functools import reduce
 
+# --- Day 9: Smoke Basin ---
+
+
 flatten = itertools.chain.from_iterable
 
 Point = namedtuple("Point", ["row", "col", "height"])

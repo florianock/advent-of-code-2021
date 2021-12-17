@@ -2,6 +2,8 @@
 import re
 from aocd import data, submit
 
+# --- Day 17: Trick Shot ---
+
 
 def main():
     ex1, ex2 = solve(example)

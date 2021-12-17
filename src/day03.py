@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# --- Day 3: Binary Diagnostic ---
+
+
 def get_diagnostics_report(filename):
     with open(filename) as f:
         return [*map(lambda line:line.strip(), f.readlines())]

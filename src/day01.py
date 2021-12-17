@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# --- Day 1: Sonar Sweep ---
+
+
 def read_numbers(filename):
     with open(filename) as f:
         return [*map(int, f.readlines())]

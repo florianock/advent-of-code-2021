@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 from collections import namedtuple
 
+# --- Day 4: Giant Squid ---
+
+
 Row = list[int]
 Col = list[int]
 Board = list[Row]

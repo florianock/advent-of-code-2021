@@ -3,6 +3,7 @@ import operator
 from functools import reduce
 from aocd import data, submit
 
+# --- Day 16: Packet Decoder ---
 
 Operators = {
     0: operator.add,

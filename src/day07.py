@@ -2,6 +2,8 @@
 from functools import reduce
 from aocd import data, submit
 
+# --- Day 7: The Treachery of Whales ---
+
 
 def main():
     inputs = [int(x) for x in data.split(',')]
