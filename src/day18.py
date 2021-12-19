@@ -188,12 +188,6 @@ def sf_explode(a: tuple, current_depth: int = 0, exploded: bool = False) -> (tup
                     else:
                         right = push_number(rest_right, right)
                     rest_right = 0
-            # else:
-            #     print("help[0]")
-        # else:
-        #     if rest_left:
-        #         left = a[0] + rest_left
-        #         rest_left = 0
         if type(a[1]) is tuple:
             if not exploded:
                 right, rest, exploded = sf_explode(a[1], current_depth + 1)
@@ -205,18 +199,6 @@ def sf_explode(a: tuple, current_depth: int = 0, exploded: bool = False) -> (tup
                     else:
                         left = push_number(rest_left * -1, left)
                     rest_left = 0
-            # else:
-            #     print("help[1]")
-                # print(f"help[1]: ({left}, {right}), ({rest_left}, {rest_right})")
-                # if rest_right:
-                #     right = (right[0] + rest_right, right[1])
-                #     rest_right = 0
-                # if type(left[1]) is int:
-                #     left = (left[0], left[1] + rest_left)
-        # else:
-        #     if rest_right:
-        #         right = a[1] + rest_right
-        #         rest_right = 0
     if current_depth > 0:
         return (left, right), (rest_left, rest_right), exploded
     return (left, right), (), exploded
