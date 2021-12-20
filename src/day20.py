@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import itertools
+from typing import Literal
 
 from aocd import data, submit
 
@@ -7,7 +8,7 @@ from aocd import data, submit
 
 flatten = itertools.chain.from_iterable
 
-Pixel: int = 1 | 0
+Pixel = int
 EnhancementAlgorithm = list[Pixel]
 Image = list[list[Pixel]]
 
@@ -39,8 +40,32 @@ def enhance(inputs: str, repeats: int) -> int:
             default_pixel = 1
         elif default_pixel == 1 and image_enhancement_algorithm[-1] == 0:
             default_pixel = 0
-        display(image)
+    display(image)
     return sum(flatten(image))
+
+
+def enhance_image(image: Image, image_enhancement_algorithm: EnhancementAlgorithm, default_pixel: Pixel) -> Image:
+    enhanced_image = [[0 for r in range(len(image))] for c in range(len(image[0]))]
+    for i, row in enumerate(enhanced_image):
+        for j, _ in enumerate(row):
+            surrounding = get_surrounding_pixels(i, j, image, default_pixel)
+            idx = int("".join([str(p) for p in surrounding]), 2)
+            if image_enhancement_algorithm[idx] == 1:
+                enhanced_image[i][j] = 1
+    return enhanced_image
+
+
+def get_surrounding_pixels(i: int, j: int, img: Image, d: Pixel) -> list[Pixel]:
+    return [get_pixel(i - 1, j - 1, img, d), get_pixel(i - 1, j, img, d), get_pixel(i - 1, j + 1, img, d),
+            get_pixel(i,     j - 1, img, d), get_pixel(i,     j, img, d), get_pixel(i,     j + 1, img, d),
+            get_pixel(i + 1, j - 1, img, d), get_pixel(i + 1, j, img, d), get_pixel(i + 1, j + 1, img, d)]
+
+
+def get_pixel(i: int, j: int, image: Image, default_pixel: Pixel) -> Pixel:
+    if 0 <= i < len(image) and 0 <= j < len(image[0]):
+        return image[i][j]
+    else:
+        return default_pixel
 
 
 def create_image(inputs: str, padding: int) -> Image:
@@ -50,30 +75,6 @@ def create_image(inputs: str, padding: int) -> Image:
     for j in range(padding):
         image.append(len(image[0]) * [0])
     return image
-
-
-def enhance_image(image: Image, image_enhancement_algorithm: EnhancementAlgorithm, default_pixel: Pixel) -> Image:
-    enhanced_image = [[0 for r in range(len(image))] for c in range(len(image[0]))]
-    for i, row in enumerate(enhanced_image):
-        for j, _ in enumerate(row):
-            surrounding = get_surrounding_pixels(i, j, image, default_pixel)
-            idx = int("".join([str(c) for c in surrounding]), 2)
-            if image_enhancement_algorithm[idx] == 1:
-                enhanced_image[i][j] = 1
-    return enhanced_image
-
-
-def get_surrounding_pixels(i: int, j: int, image: Image, d: Pixel) -> list[Pixel]:
-    return [get_pixel(i - 1, j - 1, image, d), get_pixel(i - 1, j, image, d), get_pixel(i - 1, j + 1, image, d),
-            get_pixel(i, j - 1, image, d), get_pixel(i, j, image, d), get_pixel(i, j + 1, image, d),
-            get_pixel(i + 1, j - 1, image, d), get_pixel(i + 1, j, image, d), get_pixel(i + 1, j + 1, image, d)]
-
-
-def get_pixel(i: int, j: int, image: Image, default_pixel: Pixel) -> Pixel:
-    if 0 <= i < len(image) and 0 <= j < len(image[0]):
-        return image[i][j]
-    else:
-        return default_pixel
 
 
 def display(image: Image):
