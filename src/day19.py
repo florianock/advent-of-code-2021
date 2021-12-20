@@ -30,11 +30,12 @@ def solve(inputs: str, match_criteria: int = 12) -> int:
             continue
         overlap = scanner.find_overlap(s, match_criteria)
         if overlap:
+            # TODO rotate scanner to find correct coordinates such that at least 12 beacons overlap with known beacons
             match = overlap.popitem()
-            scanner_beacon, other_beacon = match[0], match[1]
-            new_x = scanner_beacon.position.x - other_beacon.position.x
-            new_y = scanner_beacon.position.y - other_beacon.position.y
-            new_z = scanner_beacon.position.z - other_beacon.position.z
+            known_beacon, new_beacon = match[0], match[1]
+            new_x = known_beacon.position.x - new_beacon.position.x
+            new_y = known_beacon.position.y - new_beacon.position.y
+            new_z = known_beacon.position.z - new_beacon.position.z
             s.set_position(Point(new_x, new_y, new_z))
             beacons.update(s.get_beacons())
             scanner.network.add(s)
@@ -52,6 +53,10 @@ class Point:
     z: int
 
     def distance(self, point) -> int:
+        manhattan = abs(self.x - point.x) + abs(self.y - point.y) + abs(self.z - point.z)
+        return manhattan
+
+    def euclidean_distance(self, point) -> int:
         pythagoras = abs(self.x - point.x) ** 2 + abs(self.y - point.y) ** 2 + abs(self.z - point.z) ** 2
         return int(sqrt(pythagoras))
 
