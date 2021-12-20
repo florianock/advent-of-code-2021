@@ -1,18 +1,200 @@
 #!/usr/bin/env python3
+import copy
+import re
+from dataclasses import dataclass
+from math import sqrt
+
 from aocd import data, submit
 
 # --- Day 19: Beacon scanner ---
 
 
 def main():
+    b1 = solve(basic, 3)
+    assert b1 == 3, f"expected 3, but got {b1}"
     ex1 = solve(example)
     assert ex1 == 79, f"expected 79, but got {ex1}"
-    print(data)
+    # print(data)
 
 
-def solve(inputs: str) -> int:
-    scanners = inputs.split('\n\n')
-    return 79
+def solve(inputs: str, match_criteria: int = 12) -> int:
+    reports = inputs.split('\n\n')
+    # 1. Create scanners
+    scanners = [Scanner(r) for r in reports]
+    # 2. We use scanner 0 as reference
+    scanner = next(s for s in scanners if s.id == 0)
+    scanner.position = Point(0, 0, 0)
+    beacons = set(scanner.get_beacons())
+    for s in scanners:
+        if s is scanner or s in scanner.network:
+            continue
+        overlap = scanner.find_overlap(s, match_criteria)
+        if overlap:
+            match = overlap.popitem()
+            scanner_beacon, other_beacon = match[0], match[1]
+            new_x = scanner_beacon.position.x - other_beacon.position.x
+            new_y = scanner_beacon.position.y - other_beacon.position.y
+            new_z = scanner_beacon.position.z - other_beacon.position.z
+            s.set_position(Point(new_x, new_y, new_z))
+            beacons.update(s.get_beacons())
+            scanner.network.add(s)
+    return len(beacons)
+
+
+@dataclass
+class Point:
+    """
+    Basic 3D Point class that has a method to calculate the Pythagorean distance to some given point and a method
+    to readjust it's position according to some new origin
+    """
+    x: int
+    y: int
+    z: int
+
+    def distance(self, point) -> int:
+        pythagoras = abs(self.x - point.x) ** 2 + abs(self.y - point.y) ** 2 + abs(self.z - point.z) ** 2
+        return int(sqrt(pythagoras))
+
+    def set_origin(self, point):
+        self.x = point.x + self.x
+        self.y = point.y + self.y
+        self.z = point.z + self.z
+
+    def rotate(self):
+        yield Point(self.x, self.z, self.y)
+        yield Point(self.y, self.x, self.z)
+        yield Point(self.x, self.y, self.z)
+        yield Point(self.y, self.z, self.x)
+        yield Point(self.z, self.x, self.y)
+        yield Point(self.z, self.y, self.x)
+        for p in self.orientations():
+            yield p
+        # for p in self.orientations(Point(self.x, self.y, self.z)):
+        #     yield p
+        # for p in self.orientations(Point(self.x, self.z, self.y)):
+        #     yield p
+        # for p in self.orientations(Point(self.y, self.x, self.z)):
+        #     yield p
+        #
+        # for p in self.orientations(Point(self.y, self.z, point.x)):
+        #     yield self
+        # for p in self.orientations(Point(self.z, point.x, point.y)):
+        #     yield p
+        # for p in self.orientations(Point(self.z, point.y, point.x)):
+        #     yield p
+
+    def orientations(self):
+        yield Point(self.x * -1, self.y, self.z)
+        yield Point(self.x, self.y * -1, self.z)
+        yield Point(self.x, self.y, self.z * -1)
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    def __lt__(self, other):
+        return self.__hash__() < other.__hash__()
+
+    def __hash__(self):
+        return hash(self.__key__())
+
+    def __key__(self) -> tuple:
+        return self.x, self.y, self.z
+
+
+@dataclass
+class Beacon:
+    """
+    A Beacon knows all distances to other beacons
+    """
+    position: Point
+    distances: []
+
+    def set_distances(self, beacons: list[Point]):
+        for b in beacons:
+            dist = self.position.distance(b)
+            self.distances.append(dist)
+            self.distances.sort()
+
+    def find_common(self, beacon) -> list[int]:
+        return [i for i in beacon.distances if i in self.distances]
+
+    def normalize_position(self, origin: Point):
+        self.position.set_origin(origin)
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+    def __lt__(self, other):
+        return self.__hash__() < other.__hash__()
+
+    def __hash__(self):
+        return hash(self.__key__())
+
+    def __key__(self) -> tuple:
+        return self.position.__key__()
+
+
+class Scanner:
+    """
+    A scanner knows beacons.
+    """
+    def __init__(self, report: str):
+        self.beacons: list[Beacon] = []
+        self.position: Point = None
+        self.network: set[Scanner] = {self}
+        lines = report.split('\n')
+        n = re.findall(r'(\d+)', lines[0])
+        self.id = int(n[0])
+        for line in lines[1:]:
+            self.add_beacon(line)
+        beacon_positions = [b.position for b in self.beacons]
+        for b in self.beacons:
+            b.set_distances(beacon_positions)
+
+    def add_beacon(self, coordinates: str):
+        nums = coordinates.split(',')
+        x, y = nums[0], nums[1]
+        if len(nums) == 2:
+            z = '0'
+        else:
+            z = nums[2]
+        pos = Point(int(x), int(y), int(z))
+        self.beacons.append(Beacon(pos, []))
+
+    def find_overlap(self, scanner, threshold: int) -> dict:
+        result = {}
+        for s in self.network:
+            for b in s.get_beacons():
+                match = None
+                for c in scanner.get_beacons():
+                    common_distances = b.find_common(c)
+                    if len(common_distances) >= threshold:
+                        match = c
+                        break
+                if match:
+                    result[b] = match
+        return result
+
+    def set_position(self, pos: Point):
+        self.position = pos
+        for b in self.beacons:
+            b.normalize_position(self.position)
+
+    def get_beacons(self) -> list[Beacon]:
+        return copy.deepcopy(self.beacons)
+
+
+basic = """
+--- scanner 0 ---
+0,2
+4,1
+3,3
+
+--- scanner 1 ---
+-1,-1
+-5,0
+-2,1
+""".strip()
 
 
 example = """
